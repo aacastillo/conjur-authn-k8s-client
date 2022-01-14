@@ -31,9 +31,9 @@ function finish {
     "SECRETS_PROVIDER_P2F_PORT_FORWARD_PID"
   )
 
-  # Upon error, dump some kubernetes resources and Conjur authentication policy
+  # Upon error, dump kubernetes resources and Conjur authentication policy
   if [ $exit_code -ne 0 ]; then
-    dump_kubernetes_resources
+    dump_kubernetes_resources "$TEST_APP_NAMESPACE_NAME"
     dump_authentication_policy
   fi
 

@@ -16,6 +16,15 @@ if [[ "$CONJUR_OSS_HELM_INSTALLED" == "false" ]]; then
   check_env_var CONJUR_FOLLOWER_URL
 fi
 
+function finish {
+  # Upon error, dump kubernetes resources in Conjur Namespace
+  if [ $? -ne 0 ]; then
+    dump_kubernetes_resources "$CONJUR_NAMESPACE_NAME"
+    announce "Test FAILED!!!!"
+  fi
+}
+trap finish EXIT
+
 set_namespace default
 
 # Prepare our cluster with conjur and authnK8s credentials in a golden configmap

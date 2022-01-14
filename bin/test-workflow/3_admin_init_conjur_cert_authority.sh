@@ -12,6 +12,15 @@ check_env_var AUTHENTICATOR_ID
 
 TEST_JWT_FLOW="${TEST_JWT_FLOW:-false}"
 
+function finish {
+  # Upon error, dump kubernetes resources in Conjur Namespace
+  if [ $? -ne 0 ]; then
+    dump_kubernetes_resources "$CONJUR_NAMESPACE_NAME"
+    announce "Test FAILED!!!!"
+  fi
+}
+trap finish EXIT
+
 announce "Initializing Conjur certificate authority."
 
 if [[ "$CONJUR_PLATFORM" != "jenkins" ]]; then

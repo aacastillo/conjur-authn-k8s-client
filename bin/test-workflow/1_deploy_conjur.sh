@@ -5,6 +5,15 @@ cd "$(dirname "$0")" || ( echo "cannot cd into dir" && exit 1 )
 
 source utils.sh
 
+function finish {
+  # Upon error, dump kubernetes resources in the Conjur Namespace
+  if [ $? -ne 0 ]; then
+    dump_kubernetes_resources "$CONJUR_NAMESPACE_NAME"
+    announce "Test FAILED!!!!"
+  fi
+}
+trap finish EXIT
+
 function setup_conjur_enterprise {
   docker pull "$CONJUR_APPLIANCE_IMAGE"
 

@@ -12,6 +12,15 @@ check_env_var CONJUR_AUTHN_LOGIN_PREFIX
 check_env_var SECRETS_PROVIDER_TAG
 check_env_var SECRETLESS_BROKER_TAG
 
+function finish {
+  # Upon error, dump kubernetes resources in the test app namespace
+  if [ $? -ne 0 ]; then
+    dump_kubernetes_resources "$TEST_APP_NAMESPACE_NAME"
+    announce "Test FAILED!!!!"
+  fi
+}
+trap finish EXIT
+
 set_namespace "$TEST_APP_NAMESPACE_NAME"
 
 pushd ../../helm/conjur-app-deploy > /dev/null

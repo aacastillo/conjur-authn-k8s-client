@@ -208,26 +208,27 @@ function urlencode() {
 }
 
 function dump_kubernetes_resources() {
-  echo "Status of pods in namespace $TEST_APP_NAMESPACE_NAME:"
-  "$cli" get -n "$TEST_APP_NAMESPACE_NAME" pods
-  echo "Display pods in namespace $TEST_APP_NAMESPACE_NAME:"
-  "$cli" get -n "$TEST_APP_NAMESPACE_NAME" pods -o yaml
-  echo "Describe pods in namespace $TEST_APP_NAMESPACE_NAME:"
-  "$cli" describe -n "$TEST_APP_NAMESPACE_NAME" pods
-  echo "Services:in namespace $TEST_APP_NAMESPACE_NAME:"
-  "$cli" get -n "$TEST_APP_NAMESPACE_NAME" svc
-  echo "ServiceAccounts:in namespace $TEST_APP_NAMESPACE_NAME:"
-  "$cli" get -n "$TEST_APP_NAMESPACE_NAME" serviceaccounts
-  echo "Deployments in namespace $TEST_APP_NAMESPACE_NAME:"
-  "$cli" get -n "$TEST_APP_NAMESPACE_NAME" deployments
+  namespace="$1"
+  echo "Status of pods in namespace $namespace:"
+  "$cli" get -n "$namespace" pods
+  echo "Display pods in namespace $namespace:"
+  "$cli" get -n "$namespace" pods -o yaml
+  echo "Describe pods in namespace $namespace:"
+  "$cli" describe -n "$namespace" pods
+  echo "Services:in namespace $namespace:"
+  "$cli" get -n "$namespace" svc
+  echo "ServiceAccounts:in namespace $namespace:"
+  "$cli" get -n "$namespace" serviceaccounts
+  echo "Deployments in namespace $namespace:"
+  "$cli" get -n "$namespace" deployments
   if [[ "$PLATFORM" == "openshift" ]]; then
-    echo "DeploymentConfigs in namespace $TEST_APP_NAMESPACE_NAME:"
-    "$cli" get -n "$TEST_APP_NAMESPACE_NAME" deploymentconfigs
+    echo "DeploymentConfigs in namespace $namespace:"
+    "$cli" get -n "$namespace" deploymentconfigs
   fi
-  echo "Roles in namespace $TEST_APP_NAMESPACE_NAME:"
-  "$cli" get -n "$TEST_APP_NAMESPACE_NAME" roles
-  echo "RoleBindings in namespace $TEST_APP_NAMESPACE_NAME:"
-  "$cli" get -n "$TEST_APP_NAMESPACE_NAME" rolebindings
+  echo "Roles in namespace $namespace:"
+  "$cli" get -n "$namespace" roles
+  echo "RoleBindings in namespace $namespace:"
+  "$cli" get -n "$namespace" rolebindings
   echo "ClusterRoles in the cluster:"
   "$cli" get clusterroles
   echo "ClusterRoleBindings in the cluster:"

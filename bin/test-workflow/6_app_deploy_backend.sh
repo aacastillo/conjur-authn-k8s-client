@@ -3,12 +3,21 @@
 set -euo pipefail
 cd "$(dirname "$0")" || ( echo "cannot cd into dir" && exit 1 )
 
-TIMEOUT="${TIMEOUT:-5m0s}"
-
 source utils.sh
+
+TIMEOUT="${TIMEOUT:-5m0s}"
 
 check_env_var TEST_APP_NAMESPACE_NAME
 check_env_var SAMPLE_APP_BACKEND_DB_PASSWORD
+
+function finish {
+  # Upon error, dump kubernetes resources in test app Namespace
+  if [ $? -ne 0 ]; then
+    dump_kubernetes_resources "$TEST_APP_NAMESPACE_NAME"
+    announce "Test FAILED!!!!"
+  fi
+}
+trap finish EXIT
 
 announce "Deploying test app postgres backend for $TEST_APP_NAMESPACE_NAME."
 

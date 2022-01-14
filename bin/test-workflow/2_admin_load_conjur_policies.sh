@@ -7,6 +7,15 @@ PLATFORM="${PLATFORM:-kubernetes}"
 
 source utils.sh
 
+function finish {
+  # Upon error, dump kubernetes resources in the Conjur Namespace
+  if [ $? -ne 0 ]; then
+    dump_kubernetes_resources "$CONJUR_NAMESPACE_NAME"
+    announce "Test FAILED!!!!"
+  fi
+}
+trap finish EXIT
+
 if [[ "$CONJUR_OSS_HELM_INSTALLED" == "true" ]]; then
   export CONJUR_ADMIN_PASSWORD="$(get_admin_password)"
 fi
@@ -98,8 +107,6 @@ pushd policy > /dev/null
 
   sed "s#{{ AUTHENTICATOR_ID }}#$AUTHENTICATOR_ID#g" ./templates/app-grants.template.yml > ./generated/"$TEST_APP_NAMESPACE_NAME".app-grants.yml
 popd > /dev/null
-
-
 
 if [[ "$CONJUR_PLATFORM" == "jenkins" ]]; then
   JWKS_URI="NONE"

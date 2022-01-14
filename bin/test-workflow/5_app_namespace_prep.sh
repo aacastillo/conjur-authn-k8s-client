@@ -3,14 +3,24 @@
 set -euo pipefail
 cd "$(dirname "$0")" || ( echo "cannot cd into dir" && exit 1 )
 
-TIMEOUT="${TIMEOUT:-5m0s}"
-
 source utils.sh
 
 check_env_var TEST_APP_NAMESPACE_NAME
 check_env_var CONJUR_NAMESPACE_NAME
+
+TIMEOUT="${TIMEOUT:-5m0s}"
 TEST_JWT_FLOW="${TEST_JWT_FLOW:-false}"
-export AUTHN_STRATEGY="authn-k8s"
+AUTHN_STRATEGY="authn-k8s"
+
+function finish {
+  # Upon error, dump kubernetes resources in test app Namespace
+  if [ $? -ne 0 ]; then
+    dump_kubernetes_resources "$TEST_APP_NAMESPACE_NAME"
+    announce "Test FAILED!!!!"
+  fi
+}
+trap finish EXIT
+
 set_namespace default
 
 if [[ "$TEST_JWT_FLOW" == "true" ]]; then
