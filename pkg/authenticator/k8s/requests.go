@@ -48,6 +48,9 @@ func AuthenticateRequest(ctx context.Context, authnURL string, conjurVersion str
 
 	log.Debug(log.CAKC046, authenticateURL)
 
+	fmt.Printf("***TEMP*** AuthnURL: %s \n", authnURL)
+	fmt.Printf("***TEMP*** authenticateURL: %s \n", authenticateURL)
+
 	if req, err = http.NewRequest("POST", authenticateURL, nil); err != nil {
 		return nil, log.RecordedError(log.CAKC023, err)
 	}
