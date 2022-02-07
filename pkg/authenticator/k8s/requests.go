@@ -63,9 +63,9 @@ func AuthenticateRequest(ctx context.Context, authnURL string, conjurVersion str
 
 	requestDump, err := httputil.DumpRequest(req, true)
 	if err != nil {
-		fmt.Printf("Error dumping request header.")
+		fmt.Printf("***TEMP*** Error dumping request header.")
 	} else {
-		fmt.Printf("Request Header: %s", string(requestDump))
+		fmt.Printf("***TEMP*** Request Header: %s", string(requestDump))
 	}
 
 	return req, nil
