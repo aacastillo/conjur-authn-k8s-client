@@ -13,6 +13,7 @@ import (
 
 // LoginRequest sends a login request
 func LoginRequest(ctx context.Context, authnURL string, conjurVersion string, csrBytes []byte, usernamePrefix string) (*http.Request, error) {
+	fmt.Println("***TEMP*** Test to make sure authn-k8s-conjur-client is updated")
 	var authenticateURL string
 
 	if conjurVersion == "4" {
