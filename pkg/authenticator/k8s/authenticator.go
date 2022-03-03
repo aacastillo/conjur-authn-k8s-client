@@ -19,7 +19,6 @@ import (
 
 	"github.com/fullsailor/pkcs7"
 	"go.opentelemetry.io/otel"
-	oteltrace "go.opentelemetry.io/otel/trace"
 
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/access_token"
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/authenticator/common"
@@ -158,7 +157,7 @@ func (auth *Authenticator) login(ctx context.Context, tracer trace.Tracer) error
 
 	log.Debug(log.CAKC041, auth.config.Common.Username)
 
-	_, span := tracer.Start(ctx, "Generate CSR")
+	ctx, span := tracer.Start(ctx, "Generate CSR")
 	csrRawBytes, err := auth.generateCSR(auth.config.Common.Username.Suffix)
 
 	csrBytes := pem.EncodeToMemory(&pem.Block{
@@ -304,11 +303,6 @@ func (auth *Authenticator) sendAuthenticationRequest(ctx context.Context, tracer
 		span.RecordErrorAndSetStatus(err)
 		return nil, err
 	}
-
-	spanCtx := oteltrace.SpanContextFromContext(ctx)
-	fmt.Printf("***TEMP*** Sending authenticate request with Span Context:\n")
-	fmt.Printf("***TEMP***     TraceID:    %x\n", spanCtx.TraceID())
-	fmt.Printf("***TEMP***     SpanID:     %x\n", spanCtx.SpanID())
 
 	req, err := AuthenticateRequest(
 		ctx,
