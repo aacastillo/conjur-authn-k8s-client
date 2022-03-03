@@ -166,7 +166,7 @@ func (auth *Authenticator) login(ctx context.Context, tracer trace.Tracer) error
 	})
 	span.End()
 
-	req, err := LoginRequest(auth.config.Common.URL, auth.config.ConjurVersion, csrBytes, auth.config.Common.Username.Prefix)
+	req, err := LoginRequest(ctx, auth.config.Common.URL, auth.config.ConjurVersion, csrBytes, auth.config.Common.Username.Prefix)
 	if err != nil {
 		return err
 	}

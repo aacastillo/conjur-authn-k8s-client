@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 
 	"github.com/cyberark/conjur-authn-k8s-client/pkg/log"
@@ -13,7 +12,7 @@ import (
 )
 
 // LoginRequest sends a login request
-func LoginRequest(authnURL string, conjurVersion string, csrBytes []byte, usernamePrefix string) (*http.Request, error) {
+func LoginRequest(ctx context.Context, authnURL string, conjurVersion string, csrBytes []byte, usernamePrefix string) (*http.Request, error) {
 	var authenticateURL string
 
 	if conjurVersion == "4" {
@@ -30,6 +29,10 @@ func LoginRequest(authnURL string, conjurVersion string, csrBytes []byte, userna
 	}
 	req.Header.Set("Content-Type", "text/plain")
 	req.Header.Set("Host-Id-Prefix", usernamePrefix)
+
+	// Propagate context for tracing
+	headCarrier := propagation.HeaderCarrier(req.Header)
+	propagation.TraceContext{}.Inject(ctx, headCarrier)
 
 	return req, nil
 }
@@ -48,25 +51,15 @@ func AuthenticateRequest(ctx context.Context, authnURL string, conjurVersion str
 
 	log.Debug(log.CAKC046, authenticateURL)
 
-	fmt.Printf("***TEMP*** AuthnURL: %s \n", authnURL)
-	fmt.Printf("***TEMP*** authenticateURL: %s \n", authenticateURL)
-
 	if req, err = http.NewRequest("POST", authenticateURL, nil); err != nil {
 		return nil, log.RecordedError(log.CAKC023, err)
 	}
 
-	//TODO: If Conjur environmental variable exists, Inject context into request
+	// Propagate context for tracing
 	headCarrier := propagation.HeaderCarrier(req.Header)
 	propagation.TraceContext{}.Inject(ctx, headCarrier)
 
 	req.Header.Set("Content-Type", "text/plain")
-
-	requestDump, err := httputil.DumpRequest(req, true)
-	if err != nil {
-		fmt.Printf("***TEMP*** Error dumping request header.")
-	} else {
-		fmt.Printf("***TEMP*** Request Header: %s", string(requestDump))
-	}
 
 	return req, nil
 }
